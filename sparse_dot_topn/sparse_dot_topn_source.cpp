@@ -26,7 +26,6 @@
 
 #include "./sparse_dot_topn_source.h"
 
-bool candidate_cmp(candidate c_i, candidate c_j) { return (c_i.value > c_j.value); }
 
 /*
 	C++ implementation of sparse_dot_topn
@@ -117,10 +116,10 @@ void sparse_dot_topn_source(
 
 		int len = (int)candidates.size();
 		if (len > ntop){
-			std::partial_sort(candidates.begin(), candidates.begin()+ntop, candidates.end(), candidate_cmp);
+			std::partial_sort(candidates.begin(), candidates.begin()+ntop, candidates.end());
 			len = ntop;
 		} else {
-			std::sort(candidates.begin(), candidates.end(), candidate_cmp);
+			std::sort(candidates.begin(), candidates.end());
 		}
 
 		for(int a=0; a < len; a++){
@@ -242,10 +241,10 @@ int sparse_dot_topn_extd_source(
 		int len = (int)candidates.size();
 		*n_minmax = (len > *n_minmax)? len : *n_minmax;
 		if (len > ntop){
-			std::partial_sort(candidates.begin(), candidates.begin()+ntop, candidates.end(), candidate_cmp);
+			std::partial_sort(candidates.begin(), candidates.begin()+ntop, candidates.end());
 			len = ntop;
 		} else {
-			std::sort(candidates.begin(), candidates.end(), candidate_cmp);
+			std::sort(candidates.begin(), candidates.end());
 		}
 		if (len + nnz > nnz_max){
 			if (!nnz_max_is_too_small){

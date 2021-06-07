@@ -24,9 +24,16 @@
 #define UTILS_CPPCLASS_H
 
 
-struct candidate {int index; double value;};
+struct candidate {
+	int index;
+	double value;
 
-extern bool candidate_cmp(candidate c_i, candidate c_j);
+	bool operator<(const candidate& a) const
+    {
+        return a.value < value;
+    }
+	
+};
 
 extern void sparse_dot_topn_source(
 		int n_row,

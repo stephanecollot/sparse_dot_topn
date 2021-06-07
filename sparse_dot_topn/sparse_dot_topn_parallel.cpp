@@ -184,16 +184,14 @@ void inner_sparse_dot_topn(
 			std::partial_sort(
 					candidate_arr_begin,
 					candidate_arr_begin + ntop_inner,
-					candidate_arr_begin + len,
-					candidate_cmp
+					candidate_arr_begin + len
 			);
 			len = ntop_inner;
 		}
 		else {
 			std::sort(
 					candidate_arr_begin,
-					candidate_arr_begin + len,
-					candidate_cmp
+					candidate_arr_begin + len
 			);
 		}
 
@@ -349,16 +347,14 @@ void inner_sparse_dot_topn_extd(
 			std::partial_sort(
 					candidate_arr_begin,
 					candidate_arr_begin + ntop_inner,
-					candidate_arr_begin + len,
-					candidate_cmp
+					candidate_arr_begin + len
 			);
 			len = ntop_inner;
 		}
 		else {
 			std::sort(
 					candidate_arr_begin,
-					candidate_arr_begin + len,
-					candidate_cmp
+					candidate_arr_begin + len
 			);
 		}
 
