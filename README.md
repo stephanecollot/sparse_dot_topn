@@ -17,6 +17,11 @@ N = 10
 a = rand(100, 1000000, density=0.005, format='csr')
 b = rand(1000000, 200, density=0.005, format='csr')
 
+# Default precision type is np.float64, but you can down cast to have a small memory footprint and faster execution
+# Remark : These are the only 2 types supported now, since we assume that float16 will be difficult to implement and will be slower, because C doesn't support a 16-bit float type on most PCs
+a = a.astype(np.float32)
+b = b.astype(np.float32)
+
 # Use standard implementation
 
 c = awesome_cossim_topn(a, b, N, 0.01)
@@ -38,4 +43,13 @@ pip install sparse_dot_topn
 ## Uninstall
 ``` sh
 pip uninstall sparse_dot_topn
+```
+
+
+## Local development
+
+``` sh
+python setup.py clean --all
+python setup.py develop
+pytest
 ```

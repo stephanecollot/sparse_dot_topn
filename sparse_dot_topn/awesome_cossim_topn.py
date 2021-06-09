@@ -12,7 +12,7 @@ else:
 
 
 def awesome_cossim_topn(
-        A, B, ntop, lower_bound=0, use_threads=False, n_jobs=1, return_best_ntop=False):
+        A, B, ntop, lower_bound=0, use_threads=False, n_jobs=1, return_best_ntop=False, test_nnz_max=-1):
     """
     This function will return a matrix C in CSR format, where
     C = [sorted top n results > lower_bound for each row of A * B].
@@ -51,6 +51,10 @@ def awesome_cossim_topn(
     if not isspmatrix_csr(B):
         B = B.tocsr()
 
+    dtype = A.dtype
+    assert B.dtype == dtype
+    lower_bound = dtype.type(lower_bound)  # Casting this scalar to the same type
+
     M, K1 = A.shape
     K2, N = B.shape
 
@@ -74,7 +78,7 @@ def awesome_cossim_topn(
             return output
 
     indptr = np.empty(M + 1, dtype=idx_dtype)
-    
+
     # reduce nnz_max if too large to fit in available memory:
     nnz_max = 16*nnz_max
     while (not try_malloc(nnz_max, idx_dtype, A.dtype)):
@@ -83,14 +87,18 @@ def awesome_cossim_topn(
     # take a chance on high matrix-sparsity and reduce further:
     nnz_max = max(M, nnz_max//16)
     
+    # this line is only for testing purposes, designed to enable the user to 
+    # force C/C++ to reallocate memory during the matrix multiplication
+    nnz_max = test_nnz_max if test_nnz_max > 0 else nnz_max
+    
     # filled matrices from here on
     indices = np.empty(nnz_max, dtype=idx_dtype)
     data = np.empty(nnz_max, dtype=A.dtype)
-    
+
     best_ntop_arr = np.full(1, 0, dtype=idx_dtype)
-    
+
     if not use_threads:
-    
+
         alt_indices, alt_data = ct.sparse_dot_topn_extd(
             M, N, np.asarray(A.indptr, dtype=idx_dtype),
             np.asarray(A.indices, dtype=idx_dtype),
@@ -119,15 +127,14 @@ def awesome_cossim_topn(
             lower_bound,
             indptr, indices, data, best_ntop_arr, n_jobs
         )
-    
+
     if alt_indices is not None:
         indices = alt_indices
         data = alt_data
-        
+
     # prepare and return the output:
     output = csr_matrix((data, indices, indptr), shape=(M, N))
     if return_best_ntop:
         return output, best_ntop_arr[0]
     else:
         return output
-
